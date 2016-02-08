@@ -4,9 +4,14 @@ namespace HelloWorld
 {
     class Program
     {
+        static void Say(string message)
+        {
+            Console.WriteLine(message);
+        }
+
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
+            Say("Hello World!");
             Console.Read();
         }
     }
