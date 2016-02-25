@@ -23,7 +23,6 @@ namespace CircleObject
             {
                 return radius;
             }
-
             set
             {
                 radius = value;
