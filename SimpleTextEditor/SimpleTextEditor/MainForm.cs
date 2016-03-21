@@ -1,27 +1,70 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Collections.Generic;
 using System.Windows.Forms;
+using System.Threading;
+using System.Drawing;
 
 
 namespace SimpleTextEditor
 {
     public partial class MainForm : Form
     {
+        private delegate void ProfanityChecker();
         DocumentStatus DS;
+        public List<string> ProfaneWords { get; set; } = new List<string>();
+        private bool ProfanityActive { get; set; } = false;
+        ProfanityForm FilterForm = null;
+        
+        Thread FilterThread;
+
         public MainForm()
         {
             InitializeComponent();
             DS = new DocumentStatus(null, this);
+            FilterForm = new ProfanityForm(this);
+            // Handle the ApplicationExit event to know when the application is exiting.
+            Application.ApplicationExit += new EventHandler(this.OnApplicationExit);
+        }
+
+        public void ActivateFilter(bool state)
+        {
+            ProfanityActive = state;
+            ThreadStart FM = new ThreadStart(FilterMethod);
+            FilterThread = new Thread(FM);
+            if (state)
+            {
+                FilterThread.Start();
+            }
+            else
+            {
+                FilterThread.Abort();
+            }
+        }
+
+        private void FilterMethod()
+        {
+            ProfanityChecker PF = new ProfanityChecker(ProfanityFilter);
+            while (ProfanityActive)
+            {
+                this.Invoke(PF);
+                Thread.Sleep(200);
+            }
+        }
+
+        private void ProfanityFilter()
+        {
+            foreach (string s in ProfaneWords)
+            {
+                int pos = richTextBox.SelectionStart;
+                richTextBox.Text = richTextBox.Text.Replace(s, new string('*', s.Length));
+                richTextBox.SelectionStart = pos;
+            }
         }
 
         private void richTextBox1_TextChanged(object sender, EventArgs e)
         {
             DS.Changed = true;
-        }
-
-        private void filesToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-
         }
 
         private DialogResult SaveChanges()
@@ -106,11 +149,6 @@ namespace SimpleTextEditor
             return richTextBox.Lines;
         }
 
-        private void menuStrip_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
-        {
-
-        }
-
         private void undoToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (richTextBox.CanUndo)
@@ -152,6 +190,20 @@ namespace SimpleTextEditor
                 MessageBoxButtons.OK, 
                 MessageBoxIcon.Information, 
                 MessageBoxDefaultButton.Button1);
+        }
+
+        private void profinityToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            FilterForm.Show();
+        }
+
+        private void helpToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+        }
+
+        private void OnApplicationExit(object sender, EventArgs e)
+        {
+            FilterThread.Abort();
         }
     }
 }
