@@ -8,34 +8,51 @@ namespace DelegatesWheelOfFortune
 {
     class Program
     {
+        private delegate int MathDelegate(int a, int b);
+
         static void Main(string[] args)
         {
             int num1, num2;
-            Console.Write("Hello ");
-            Methods met = new Methods();
+            Random R = new Random();
+            List<MathDelegate> MathMethods = new List<MathDelegate>();
+            MathMethods.Add(new MathDelegate(Add));
+            MathMethods.Add(new MathDelegate(Sub));
+            MathMethods.Add(new MathDelegate(Mul));
+            MathMethods.Add(new MathDelegate(Div));
+            MathMethods.Add(new MathDelegate(Mod));
+
             while(true)
             {
-                Console.WriteLine("type in two integer numbers:");
-                try
-                {
-                    num1 = int.Parse(Console.ReadLine());
-                    num2 = int.Parse(Console.ReadLine());
-                    Console.WriteLine($"Result was: {met.RandomMethod(num1, num2)}");
-                    Console.WriteLine($"Method used: {met.ReturnActiveMethod()}");
-                }
-                catch(ArgumentNullException)
-                {
-                    Console.WriteLine("Invalid entry");
-                }
-                catch(FormatException)
-                {
-                    Console.WriteLine("Not a number");
-                }
-                catch(OverflowException)
-                {
-                    Console.WriteLine("Number was to large");
-                }
+                Console.WriteLine("Enter two numbers:");
+                num1 = int.Parse(Console.ReadLine());
+                num2 = int.Parse(Console.ReadLine());
+                Console.WriteLine(MathMethods[R.Next(0,MathMethods.Count-1)](num1, num2));
             }
+        }
+
+        private static int Add(int x, int y)
+        {
+            return x + y;
+        }
+
+        private static int Sub(int x, int y)
+        {
+            return x - y;
+        }
+
+        private static int Mul(int x, int y)
+        {
+            return x * y;
+        }
+
+        private static int Div(int x, int y)
+        {
+            return x / y;
+        }
+
+        private static int Mod(int x, int y)
+        {
+            return x % y;
         }
     }
 }

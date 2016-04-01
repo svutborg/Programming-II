@@ -9,58 +9,35 @@ namespace RacingThreads
 {
     class Program
     {
-        delegate void ThreadDelegate();
+        private delegate void ThreadDelegate();
+
         static void Main(string[] args)
         {
             ThreadDelegate TD = new ThreadDelegate(ThreadMethod);
             ThreadStart TS = new ThreadStart(TD);
-            for (int i = 0; i < 4; i++)
+            for(int i = 0; i < 10; i++)
             {
                 Thread T = new Thread(TS);
-                T.Name = String.Format($"T{i}");
+                T.Name = string.Format("T{0}", i);
                 T.IsBackground = true;
                 T.Start();
-                if (i==2)
-                {
-                    T.Priority = ThreadPriority.Lowest;
-                }
-                else
-                {
-                    T.Priority = ThreadPriority.AboveNormal;
-                }
             }
-            
-            while(true)
-            {
-                if(Equals(ConsoleKey.Escape, Console.ReadKey().Key))
-                {
-                    
-                    break;
-                }
-            }
+
+            while (!(Console.ReadKey().Key == ConsoleKey.Escape)) ;
+
         }
 
         static void ThreadMethod()
         {
-            int num = 0;
-            string name = Thread.CurrentThread.Name;
-            int ThreadNumber = int.Parse(name.Substring(1, 1));
-            string indent = "";
-            for(int i=0;i<ThreadNumber;i++)
+            int ID = int.Parse(Thread.CurrentThread.Name.Substring(1));
+            string tabs = "";
+            for (int i = 0; i < ID; i++)
             {
-                indent += "\t";
+                tabs += "   ";
             }
-            while (true)
+            while(true)
             {
-                if (num % 100 == 0)
-                {
-                    Console.WriteLine($"{indent} {name} {num}");
-                }
-                num++;
-                if (num > 10000)
-                {
-                    Thread.CurrentThread.Abort();
-                }
+                Console.WriteLine(string.Format("{0}{1}",tabs,Thread.CurrentThread.Name));
             }
         }
     }
