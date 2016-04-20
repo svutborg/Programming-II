@@ -13,8 +13,8 @@ namespace PrimeNumbersInBackground
 {
     public partial class Form1 : Form
     {
-        delegate void PrimeDelegate();
-        delegate void AddderDelegate(int i);
+        //delegate void PrimeDelegate();
+        //delegate void AddderDelegate(int i);
         public Form1()
         {
             InitializeComponent();
@@ -23,10 +23,12 @@ namespace PrimeNumbersInBackground
 
         private void button1_Click(object sender, EventArgs e)
         {
-            PrimeDelegate PD = new PrimeDelegate(CalcPrimes);
-            ThreadStart TS = new ThreadStart(PD);
-            Thread T = new Thread(TS);
+            //PrimeDelegate PD = new PrimeDelegate(CalcPrimes);
+            //ThreadStart TS = new ThreadStart(PD);
+            //Thread T = new Thread(TS);
+            Thread T = new Thread(CalcPrimes);
             T.Name = "PrimeNumberThread";
+            T.IsBackground = true;
             T.Start();
         }
 
@@ -36,9 +38,9 @@ namespace PrimeNumbersInBackground
             listBox1.TopIndex = listBox1.Items.Count - 1;
         }
 
-        void CalcPrimes()
+        void CalcPrimes(object param)
         {
-            AddderDelegate AddLine = new AddderDelegate(LineAdder);
+            //AddderDelegate AddLine = new AddderDelegate(LineAdder);
             int number = 2;
             while (true)
             {
@@ -54,7 +56,11 @@ namespace PrimeNumbersInBackground
                 {
                     try
                     {
-                        this.Invoke(AddLine, number);
+                        //this.Invoke(AddLine, number);
+                        this.Invoke((MethodInvoker)delegate {
+                            listBox1.Items.Add(number);
+                            listBox1.TopIndex = listBox1.Items.Count - 1;
+                        });
                     }
                     catch(ObjectDisposedException)
                     {
